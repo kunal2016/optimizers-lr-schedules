@@ -1,0 +1,5 @@
+outputs.zip
+outputs_quick/
+.ipynb_checkpoints/
+__pycache__/
+input.txt

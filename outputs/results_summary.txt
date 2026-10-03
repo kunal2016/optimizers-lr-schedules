@@ -1,0 +1,11 @@
+=================== RESULTS SUMMARY ===================
+P1  hand vs PyTorch, largest difference: 3.47e-17
+P2  bias correction stops mattering (<1%): beta2=0.999 after 3,925 steps (<5%: 2,375); beta2=0.95 after 76 steps
+P3  warmup (100 steps) stops changing the update/weight ratio at step ~177 (layers 109–287)
+P4
+                   val loss @ 200  LR @ 200  @ 200 + 30-step cooldown  run to 300
+cosine (lr 4e-03)          2.0244    0.0015                       NaN      1.9322
+WSD (lr 4e-03)             2.0294    0.0040                    1.9438      1.8740
+P5  best LR: width 256: 5.76e-03, width 512: 2.63e-03, width 1024: 1.38e-03 | best LR ∝ width^-1.03 | width 4096: 3.22e-04 (range 2.5e-04–3.8e-04)
+P6  val @ 200: cosine 2.0192 ± 0.0137, WSD 2.0092 ± 0.0164 -> gap 0.0100 in favour of WSD, within seed noise (a tie) (2 × std. error = 0.0247)
+P6  run to 300: cosine 1.9246 ± 0.0107, WSD 1.8635 ± 0.0099 -> gap 0.0611 in favour of WSD, larger than seed noise (2 × std. error = 0.0169)
