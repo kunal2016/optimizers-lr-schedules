@@ -40,10 +40,16 @@ For the same gradients, the uncorrected step is the corrected step times r(t) = 
 - **β₂ = 0.999:** over the first 20 steps the uncorrected steps are 3–6× too large, because v is underestimated far more than m. The difference stays within 1% only after **3,925 steps** (within 5% after 2,375).
 - **β₂ = 0.95** (typical for LLMs): the uncorrected steps start too small, and the difference stops mattering after **76 steps**.
 
+![Bias correction on vs off over 20 steps](outputs/p2_bias_correction.png)
+
 ### 3. Update-to-weight ratio and warmup
 I logged ‖ΔW‖ / ‖W‖ for every weight matrix at every step, in two runs from the same starting weights: one with a 100-step linear warmup and one with none.
 
 Warmup ends at step 100, but the two runs' ratios only come within 10% of each other at about **step 177** (median over the 8 matrices that converge; range 109–287). The warmed-up ratios level off at about step 219. Three MLP matrices never converge within 300 steps, and their ratio stays 13–25% higher in the warmed-up run. So warmup changes the path the weights take, not just the first few updates.
+
+![Update-to-weight ratio per layer, with and without warmup](outputs/p3_update_ratio_per_layer.png)
+
+![Warmup run divided by no-warmup run, converging into the ±10% band](outputs/p3_warmup_vs_nowarmup_ratio.png)
 
 ### 4. Cosine vs WSD, scheduled for 300 steps, stopped at step 200
 Each schedule had its own 5-point LR sweep. Both picked LR 4e-3, which is inside the sweep range.
@@ -58,6 +64,8 @@ At step 200 the two models are tied (see Part 6). **I would keep the WSD model**
 - A 30-step cooldown takes WSD to 1.944, within 0.012 of what cosine reaches after all 300 steps.
 - When both run the full 300 steps, WSD finishes 0.058 lower.
 
+![Schedules, training loss and LR sweep for cosine vs WSD](outputs/p4_cosine_vs_wsd.png)
+
 ### 5. LR sweep across widths
 
 | Width | 256 | 512 | 1024 |
@@ -66,9 +74,13 @@ At step 200 the two models are tied (see Part 6). **I would keep the WSD model**
 
 The best LR falls as **width^−1.03**, almost exactly the width^−1 that standard parameterization predicts: each doubling of width roughly halves it.
 
+![Validation loss vs learning rate for widths 256, 512 and 1024](outputs/p5_lr_sweep_by_width.png)
+
 **At width 4096 I would use about 3e-4.** The fit gives 3.2e-4, and extrapolating from each pair of widths gives 2.5e-4 to 3.8e-4.
 
 **Confidence:** moderate, within about 1.5× either way. The minima line up well and match theory, but the estimate goes two doublings past the widest model I measured, uses single-seed 300-step sweeps, and shares one LR across embeddings and hidden layers. Before a long run I would check 2e-4, 3e-4 and 4.5e-4. μP would make this extrapolation unnecessary.
+
+![Best LR vs width, extrapolated to 4096](outputs/p5_lr_extrapolation.png)
 
 ### 6. Fair comparisons
 - Each schedule and each width got its own LR sweep, and comparisons always used each one's best LR. An LR minimum at the edge of the sweep is flagged.
